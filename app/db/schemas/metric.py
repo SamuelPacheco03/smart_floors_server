@@ -1,19 +1,16 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
-from typing import Optional
+from typing import Optional, List
 from decimal import Decimal
 
+class MetricIn(BaseModel):
+    timestamp: Optional[datetime] = Field(default_factory=datetime.utcnow)
+    edificio: str
+    piso: int
+    temp_C: Optional[Decimal] = None
+    humedad_pct: Optional[Decimal] = None
+    energia_kW: Optional[Decimal] = None
 
-class MetricCreate(BaseModel):
-    time: datetime
-    floor_id: int
-    temp_c: Optional[Decimal] = None
-    humidity_pct: Optional[Decimal] = None
-    energy_kw: Optional[Decimal] = None
 
-
-class MetricOut(MetricCreate):
-    id: int
-
-    class Config:
-        from_attributes = True
+class MetricInBatch(BaseModel):
+    items: List[MetricIn]

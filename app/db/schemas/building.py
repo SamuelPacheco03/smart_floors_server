@@ -3,6 +3,7 @@ from typing import Optional
 
 class BuildingBase(BaseModel):
     name: str
+    code: str
     address: Optional[str] = None
 
 class BuildingCreate(BuildingBase):
