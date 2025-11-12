@@ -1,5 +1,7 @@
 import os
+import logging
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -10,6 +12,12 @@ from app.db.models import building, floor, metric, threshold, alert
 
 from contextlib import asynccontextmanager
 
+# Configurar logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -19,17 +27,17 @@ async def lifespan(app: FastAPI):
     try:
         # 1️ Verificar conexión a la base de datos
         check_connection()
-        print("Conexión a PostgreSQL establecida correctamente.")
+        logger.info("✅ Conexión a PostgreSQL establecida correctamente.")
 
         # 2️ Crear tablas si no existen
-        print("Verificando existencia de tablas...")
+        logger.info("Verificando existencia de tablas...")
         Base.metadata.create_all(bind=engine)
-        print("Tablas verificadas / creadas correctamente.")
+        logger.info("✅ Tablas verificadas / creadas correctamente.")
     except SQLAlchemyError as e:
-        print(f"Error de SQLAlchemy: {e}")
+        logger.error(f"❌ Error de SQLAlchemy: {e}")
         raise e
     except Exception as e:
-        print(f"Error general conectando a la base de datos: {e}")
+        logger.error(f"❌ Error general conectando a la base de datos: {e}")
         raise e
 
     # yield = mientras la app esté corriendo
@@ -38,9 +46,9 @@ async def lifespan(app: FastAPI):
     # 3️Cierre limpio
     try:
         engine.dispose()
-        print("Conexión a PostgreSQL cerrada.")
+        logger.info("🧹 Conexión a PostgreSQL cerrada.")
     except Exception as e:
-        print(f"Error al cerrar conexión: {e}")
+        logger.error(f"⚠️ Error al cerrar conexión: {e}")
 
 
 # ======================================================
@@ -48,6 +56,16 @@ async def lifespan(app: FastAPI):
 # ======================================================
 
 app = FastAPI(lifespan=lifespan)
+
+# Configurar CORS - Permitir acceso desde cualquier origen
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Permite todos los orígenes
+    allow_credentials=True,
+    allow_methods=["*"],  # Permite todos los métodos (GET, POST, PUT, DELETE, etc.)
+    allow_headers=["*"],  # Permite todos los headers
+)
+
 app.include_router(api_router, prefix="/api/v1")
 
 

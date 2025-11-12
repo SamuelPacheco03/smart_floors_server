@@ -9,6 +9,10 @@ class Settings(BaseSettings):
     POSTGRES_PORT: int = 5432
     DATABASE_URL: str | None = None
     ENV: str = "dev"
+    
+    # Gemini AI Configuration
+    GEMINI_API_KEY: str = ""
+    GEMINI_MODEL: str = "gemini-1.5-flash"  # Modelo gratuito disponible
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
