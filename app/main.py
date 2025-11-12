@@ -60,7 +60,7 @@ app = FastAPI(lifespan=lifespan)
 # Configurar CORS - Permitir acceso desde cualquier origen
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Permite todos los orígenes
+    allow_origins=["https://smart-floor-client.vercel.app/", "http://localhost:3000"],  # Permite todos los orígenes
     allow_credentials=True,
     allow_methods=["*"],  # Permite todos los métodos (GET, POST, PUT, DELETE, etc.)
     allow_headers=["*"],  # Permite todos los headers
