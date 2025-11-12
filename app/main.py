@@ -2,7 +2,8 @@ import os
 from fastapi import FastAPI
 import uvicorn
 from sqlalchemy import create_engine
-from app.db.session import check_connection, engine
+from app.db.session import check_connection, engine, Base
+from app.api.v1.router import api_router
 
 async def lifespan(app: FastAPI):
     try:
@@ -21,6 +22,7 @@ async def lifespan(app: FastAPI):
         print(f"⚠️ Error al cerrar conexión: {e}")
         
 app = FastAPI(lifespan=lifespan)
+app.include_router(api_router, prefix="/api/v1")
 
 @app.get("/")
 async def root():
